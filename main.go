@@ -1,6 +1,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"sync/atomic"
@@ -22,6 +23,23 @@ func main() {
 		w.Header().Add("Content-Type", "text/plain; charset=utf-8")
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte(http.StatusText(http.StatusOK)))
+	})
+	mux.HandleFunc("POST /api/validate_chirp", func(w http.ResponseWriter, r *http.Request) {
+		type chirp struct {
+			Body string `json:"body"`
+		}
+		decoder := json.NewDecoder(r.Body)
+		ch := chirp{}
+		err := decoder.Decode(&ch)
+		if err != nil {
+			w.Header().Set("Content-Type", "application/json")
+			w.WriteHeader(500)
+			w.Write()
+		}
+		if len(ch.Body) > 140 {
+
+		}
+
 	})
 
 	s := &http.Server{
